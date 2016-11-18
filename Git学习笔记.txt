@@ -1,0 +1,477 @@
+Git学习笔记
+
+git init 和git clone：建立一个git仓库。有两种方式可以建立git仓库，一个是新建，一个是克隆现有的git仓库。 新建一个git仓库：  git init；克隆现有的git仓库：  git clone [url] [目录名（如果木有，则建立一个和原仓库同名的目录）。建立起来的git仓库都是在目录下多了一个.git目录，不同点是init的里边啥也木有，clone的是把目标git仓库复制过来了
+
+1. 创建仓库
+
+$ pwd
+/d/Git_test
+$ mkdir learngit
+$ cd learngit/
+$ ls -al
+total 0
+drwxr-xr-x 1 Administrator 197121 0 十一 16 10:44 ./
+drwxr-xr-x 1 Administrator 197121 0 十一 16 10:44 ../
+$ git init
+Initialized empty Git repository in D:/Git_test/learngit/.git/
+$ ls -al
+total 4
+drwxr-xr-x 1 Administrator 197121 0 十一 16 10:45 ./
+drwxr-xr-x 1 Administrator 197121 0 十一 16 10:44 ../
+drwxr-xr-x 1 Administrator 197121 0 十一 16 10:45 .git/
+
+2. 添加文件到Git仓库
+$ touch readme.txt
+$ ls -al
+total 4
+drwxr-xr-x 1 Administrator 197121 0 十一 16 10:48 ./
+drwxr-xr-x 1 Administrator 197121 0 十一 16 10:44 ../
+drwxr-xr-x 1 Administrator 197121 0 十一 16 10:45 .git/
+-rw-r--r-- 1 Administrator 197121 0 十一 16 10:48 readme.txt
+$ echo "123" >> readme.txt
+$ git add readme.txt
+$ git commit -m "add a readme file"
+[master (root-commit) 0cf9299] add a readme file
+ 1 file changed, 1 insertion(+)
+ create mode 100644 readme.txt
+
+ 总结：
+ 	1) 初始化一个Git仓库，使用git init命令。
+ 	2) 添加文件到Git仓库，分两步：
+ 	   第一步，使用命令git add <file>，注意，可反复多次使用，添加多个文件；
+ 	   第二步，使用命令git commit，完成。
+
+3. 修改文件后提交到仓库
+$ git status
+On branch master
+nothing to commit, working tree clean
+$ echo "456" >> readme.txt
+$ git status
+On branch master
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+        modified:   readme.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")
+$ git diff readme.txt
+diff --git a/readme.txt b/readme.txt
+index 190a180..ce8c77d 100644
+--- a/readme.txt
++++ b/readme.txt
+@@ -1 +1,2 @@
+ 123
++456
+$ git add readme.txt
+$ git status
+On branch master
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+        modified:   readme.txt
+$ git commit -m "update readme fiel"
+[master 3bcc1e2] update readme fiel
+ 1 file changed, 1 insertion(+)
+$ git status
+On branch master
+nothing to commit, working tree clean
+
+4. 查询历史版本,还原历史版本
+$ echo "789" > readme.txt
+$ git add readme.txt
+$ git commit -m "add 789 to readme.txt"
+[master c9fcbcb] add 789 to readme.txt
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+$ git log
+commit c9fcbcb0f886225f118c3d21623e6a4aa99605a8
+Author: PyTim <2894321243@qq.com>
+Date:   Wed Nov 16 11:17:08 2016 +0800
+
+    add 789 to readme.txt
+
+commit 3bcc1e20e426cf0847495bcbaea72bb9ea0f1be2
+Author: PyTim <2894321243@qq.com>
+Date:   Wed Nov 16 11:13:22 2016 +0800
+
+    update readme fiel
+
+commit 0cf92997c76e28c46c1cd890cd622a8ced5e02f4
+Author: PyTim <2894321243@qq.com>
+Date:   Wed Nov 16 11:03:55 2016 +0800
+
+    add a readme file
+$ git log --pretty=oneline
+c9fcbcb0f886225f118c3d21623e6a4aa99605a8 add 789 to readme.txt
+3bcc1e20e426cf0847495bcbaea72bb9ea0f1be2 update readme fiel
+0cf92997c76e28c46c1cd890cd622a8ced5e02f4 add a readme file
+$ git reset --hard head^^
+HEAD is now at 0cf9299 add a readme file
+$ cat readme.txt
+123
+$ git log --pretty=oneline
+0cf92997c76e28c46c1cd890cd622a8ced5e02f4 add a readme file
+$ git reset --hard 3bcc1e20e426cf0847495bcbaea72bb9ea0f1be2
+HEAD is now at 3bcc1e2 update readme fiel
+$ cat readme.txt
+123
+456
+$ git reflog
+3bcc1e2 HEAD@{0}: reset: moving to 3bcc1e20e426cf0847495bcbaea72bb9ea0f1be2
+0cf9299 HEAD@{1}: reset: moving to head^^
+c9fcbcb HEAD@{2}: commit: add 789 to readme.txt
+3bcc1e2 HEAD@{3}: commit: update readme fiel
+0cf9299 HEAD@{4}: commit (initial): add a readme file
+$ git reset --hard c9fcbcb
+HEAD is now at c9fcbcb add 789 to readme.txt
+$ cat readme.txt
+789
+$ git log --pretty=oneline
+c9fcbcb0f886225f118c3d21623e6a4aa99605a8 add 789 to readme.txt
+3bcc1e20e426cf0847495bcbaea72bb9ea0f1be2 update readme fiel
+0cf92997c76e28c46c1cd890cd622a8ced5e02f4 add a readme file
+$ git reflog
+c9fcbcb HEAD@{0}: reset: moving to c9fcbcb
+3bcc1e2 HEAD@{1}: reset: moving to 3bcc1e20e426cf0847495bcbaea72bb9ea0f1be2
+0cf9299 HEAD@{2}: reset: moving to head^^
+c9fcbcb HEAD@{3}: commit: add 789 to readme.txt
+3bcc1e2 HEAD@{4}: commit: update readme fiel
+0cf9299 HEAD@{5}: commit (initial): add a readme file
+
+总结：
+	1) HEAD指向的版本就是当前版本，因此，Git允许我们在版本的历史之间穿梭，使用命令git reset --hard commit_id。
+    2) 穿梭前，用git log可以查看提交历史，以便确定要回退到哪个版本。
+    3) 要重返未来，用git reflog查看命令历史，以便确定要回到未来的哪个版本。
+
+
+5）Git管理的是修改，而不是文件
+$ cat readme.txt
+789
+$ echo "9999">>readme.txt
+$ cat readme.txt
+789
+9999
+$ git add readme.txt
+$ git status
+On branch master
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+        modified:   readme.txt
+$ git status
+On branch master
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+        modified:   readme.txt
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+        modified:   readme.txt
+$ git commit -m "add 789 "
+[master 2311a81] add 789
+ 1 file changed, 1 insertion(+)
+$ git status
+On branch master
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+        modified:   readme.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")
+$ git diff head -- readme.txt
+diff --git a/readme.txt b/readme.txt
+index f7a7ab2..21bfeaa 100644
+--- a/readme.txt
++++ b/readme.txt
+@@ -1,2 +1,3 @@
+ 789
+ 9999
++00000
+$ git add readme.txt
+$ git commit -m "add file"
+[master ab7fb07] add file
+ 1 file changed, 1 insertion(+)
+$ git diff head -- readme.txt
+Administrator@SH12100040 MINGW64 /d/Git_test/learngit (master)
+
+
+总结：
+	1) learngit目录就是一个工作区，它下面有一个隐藏目录.git,这个是Git的版本库。
+    2) Git的版本库里存了很多东西，其中最重要的就是称为stage（或者叫index）的暂存区，还有Git为我们自动创建的第一个分支master，以及指向master的一个指针叫HEAD。
+	3) 前面讲了我们把文件往Git版本库里添加的时候，是分两步执行的：
+		第一步是用git add把文件添加进去，实际上就是把文件修改添加到暂存区；
+		第二步是用git commit提交更改，实际上就是把暂存区的所有内容提交到当前分支。
+		因为我们创建Git版本库时，Git自动为我们创建了唯一一个master分支，所以，现在，git commit就是往master分支上提交更改。
+	4) 每一次的修改都必须被add到暂存区之后才能commit到仓库中；
+
+
+6. 撤销工作区文件修改（将仓库文件同步到工作区）
+$ cat readme.txt
+789
+9999
+00000
+$ git diff head -- readme.txt
+$ echo "88888" >> readme.txt
+$ cat readme.txt
+789
+9999
+00000
+88888
+$ git diff head -- readme.txt
+diff --git a/readme.txt b/readme.txt
+index 21bfeaa..9426dbb 100644
+--- a/readme.txt
++++ b/readme.txt
+@@ -1,3 +1,4 @@
+ 789
+ 9999
+ 00000
++88888
+
+这个时候希望撤销8888的修改，需要将仓库文件同步到工作区
+$ git checkout -- readme.txt
+$ cat readme.txt
+789
+9999
+00000
+如果修改内容已经提交到了暂存区，如何恢复：
+$ echo "88888" >> readme.txt
+$ git add readme.txt
+$ git reset head readme.txt
+Unstaged changes after reset:
+M       readme.txt
+$ git checkout -- readme.txt
+$ cat readme.txt
+789
+9999
+00000
+
+总结：
+	1) 当改乱了工作区某个文件的内容，想直接丢弃工作区的修改时，用命令git checkout -- readme.txt
+	2) 当不但改乱了工作区某个文件的内容，还添加到了暂存区时，想丢弃修改，分两步，第一步用命令git reset HEAD readme.txt，第二步git checkout -- readme.txt。
+
+7. 删除文件
+$ rm readme.txt
+$ ls -lar
+total 4
+drwxr-xr-x 1 Administrator 197121 0 十一 16 14:27 .git/
+drwxr-xr-x 1 Administrator 197121 0 十一 16 10:44 ../
+drwxr-xr-x 1 Administrator 197121 0 十一 16 14:33 ./
+$ git checkout -- readme.txt
+$ ls -la
+total 5
+drwxr-xr-x 1 Administrator 197121  0 十一 16 14:33 ./
+drwxr-xr-x 1 Administrator 197121  0 十一 16 10:44 ../
+drwxr-xr-x 1 Administrator 197121  0 十一 16 14:33 .git/
+-rw-r--r-- 1 Administrator 197121 15 十一 16 14:33 readme.txt
+
+$ git rm readme.txt
+rm 'readme.txt'
+$ git commit -m "delete readme file"
+[master 6580967] delete readme file
+ 1 file changed, 3 deletions(-)
+ delete mode 100644 readme.txt
+
+总结：
+	1) 不小心删除了工作区的某个文件，可以通过git checkout -- filename进行还原；
+	2) 确实需要删除工作区的这个文件，那么同时也需要删除版本库中的这个文件，通过git rm filename删除，并git commit提交；
+
+
+8. 远程库
+	1) 先有本地库，后有远程库的时候，如何关联远程库
+		要关联一个远程库，使用命令git remote add origin git@server-name:path/repo-name.git；
+		关联后，使用命令git push -u origin master第一次推送master分支的所有内容；
+		此后，每次本地提交后，只要有必要，就可以使用命令git push origin master推送最新修改；
+		分布式版本系统的最大好处之一是在本地工作完全不需要考虑远程库的存在，也就是有没有联网都可以正常工作，
+		而SVN在没有联网的时候是拒绝干活的！当有网络的时候，再把本地提交推送一下就完成了同步，真是太方便了！
+	2) 最好的方式是先创建远程库，然后，从远程库克隆
+		git clone https://github.com/PyTim/Testing.git
+
+9. 分支管理
+	$ git checkout -b dev
+Switched to a new branch 'dev'
+$ git branch
+* dev
+  master
+$ echo "000" >> readme.txt
+$ git add readme.txt
+$ git commit -m "add fiel to dev branch"
+[dev ae2d699] add fiel to dev branch
+ 1 file changed, 1 insertion(+)
+$ git checkout master
+Switched to branch 'master'
+$ git branch
+  dev
+* master
+$ cat readme.txt
+12345
+$ git merge dev
+Updating 377d7d8..ae2d699
+Fast-forward
+ readme.txt | 1 +
+ 1 file changed, 1 insertion(+)
+$ cat readme.txt
+12345
+000
+$ git branch -d dev
+Deleted branch dev (was ae2d699).
+$ git branch
+* master
+
+
+
+命令：
+git init
+git clone
+git add
+git commit
+git status
+git diff
+git log
+git log --pretty=oneline
+git reset --hard head^^
+git reset --hard 3bcc1e20e426cf0847495bcbaea72bb9ea0f1be2
+git reflog
+git reset --hard c9fcbcb     还原版本
+git diff head -- readme.txt  比较工作区和仓库中文件区别
+git checkout -- readme.txt   
+git reset head readme.txt    可以把暂存区的修改撤销掉（unstage)
+git rm filename
+
+
+
+FAQ:
+1. $ git add readme.txt
+warning: LF will be replaced by CRLF in readme.txt.
+The file will have its original line endings in your working directory.
+
+windows中的换行符为 CRLF， 而在Linux下的换行符为LF，所以在执行add . 时出现提示，解决办法：
+$ rm -rf .git  // 删除.git  
+$ git config --global core.autocrlf false  //禁用自动转换  
+然后重新执行：
+$ git init    
+$ git add .
+
+2. $ git commit -m "add a readme file"
+
+*** Please tell me who you are.
+
+run:
+$ git config --global user.email "2894321243@qq.com"
+$ git config --global user.name "PyTim"
+
+
+
+
+
+
+工作区             暂存区          版本区             远程区
+
+1. 远程区->工作区：  git clone
+2. 工作区->暂存区:   git add
+3. 暂存区->版本区:   git commit
+4. 版本区->远程区: 	 git push
+
+5. 暂存区->工作区：  
+   如果希望保留暂存区修改: git checkout -- readme.txt
+   如果不希望保留暂存区修改：git reset head -- filename ; git checkout -- <filename>
+6. 版本区->工作区： 
+   如果已经add到暂存区：git reset head -- filename；git checkout -- <filename>
+   如果没有add到暂存区：git checkout -- <filename>
+
+7. 版本还原：
+	还原历史版本：
+	git log --pretty=oneline
+	git reset --hard head^^
+	git reset --hard 3bcc1e20e426cf0847495bcbaea72bb9ea0f1be2
+	还原未来版本：
+	git reflog
+	git reset --hard c9fcbcb
+
+8. 分支操作过程（可能会遇到合并冲突）
+	1) 创建+切换分支 git checkout -b dev
+	   创建分支: git branch dev
+	   切换分支: git checkout dev
+	　	
+	2) 查看分支：git branch <-a>
+	3) 修改文件并提交到当前分支，git add, git commit
+	4) 切换回master分支: git checkout master
+	5) 查看是否切回master: git branch
+	6) 合并分区：git merge --no-ff -m "merge with no-ff"　dev　　(这步执行之后分支修改内容才同步到master分支)
+	7) 删除分区：git branch -d dev
+	8) 查看分区：git branch
+
+	注：如果要丢弃一个没有被合并过的分支，可以通过git branch -D <name>强行删除。
+
+
+９. bug分支
+	$ git stash
+	No local changes to save
+	$ ls
+	readme.txt
+	$ cat readme.txt
+	12345
+	000
+	$ echo "999" >> readme.txt
+	$ git stash
+	Saved working directory and index state WIP on master: ae2d699 add fiel to dev branch
+	HEAD is now at ae2d699 add fiel to dev branch
+	$ git stash list
+	stash@{0}: WIP on master: ae2d699 add fiel to dev branch
+
+	1) git status 保留工作区
+	2) 确定要在哪个分支上修复bug，假定需要在master分支上修复，就从master创建临时分支：
+		git checkout master
+		git checkout -b issue-101
+		...
+		git add filename
+		git commit -m ""
+	3) 修复完成后，切换到master分支，并完成合并，最后删除issue-101分支
+		git checkout master
+		git merge --no-ff -m "merged bug fix 101" issue-101
+		git branch -d issue-101
+	4) 回到工作区：
+		git stash list
+		git stash pop
+		git stash apply stash@{0}  git stash drop
+
+10. 标签
+	1) 换到需要打标签的分支上,
+		git branch
+		git checkout master
+		
+	2) 打标签
+		git tag v1.0
+		默认标签是打在最新提交的commit上的。
+	3) 指定commitid打标签
+		git log --pretty=oneline --abbrev-commit　　查看历史提交的commitid
+		git tag v0.9 6224937　　指定commitid为6224937打标签
+		git tag -a v0.1 -m "version 0.1 released" 3628164 创建带有说明的标签
+		git tag -s v0.2 -m "signed version 0.2 released" fec145a　用PGP签名标签,前提需要首先安装gpg否则会出错
+		git tag 查看当前所有标签
+		git show <tagname>　查看某个标签的信息
+	4) 删除标签
+		git push origin <tagname> 　推送一个本地标签到远程origin库
+		git push origin --tags　　　推送全部未推送过的本地标签
+	　　git tag -d v0.1　　　　　　　删除本地标签v0.1　
+		git push origin :refs/tags/<tagname>　删除远程标签
+
+11. 配置文件
+	.gitignore  忽略某些文件时，需要编写.gitignore
+	.git/config 每个仓库的Git配置文件
+	.gitconfig 当前用户的Git配置文件放在用户主目录下的一个隐藏文件
+
+12. 其它操作：
+ 	git status
+ 	git ls-files --stage　列出暂存区的文件
+ 	git ls-files          列出版本库文件
+ 	git ls-files --stage -- readme.txt　列出暂存区某个具体文件
+ 	git ls-files -- readme.txt　列出版本库某个具体文件
+ 	git diff readme.txt 比较工作区和暂存区的文件区别
+ 	git diff --staged -- readme.txt 比较暂存区和版本库差异
+ 	git diff --cached -- readme.txt　比较暂存区和版本库差异
+ 	git diff head -- readme.txt  比较工作区和版本库中文件区别
