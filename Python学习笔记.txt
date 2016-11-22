@@ -45,6 +45,7 @@ Python学习笔记
 			%-5.2f表示左对齐，长度不足的右边补空格
 			7) 对于格式未定的字段，可以通过类似%*.*f % (5,2,1.80)来设定表示%5.2f
 			8) 对于类型不确定的字段输出可以统一用%r表示，%r的格式化指定格式后面再学习。
+			9) format输出
 					
 		2. input raw_input输入
 			>>> raw_var = raw_input("please input your content:")
@@ -1064,7 +1065,106 @@ S3
 
 
 
+内建函数
+	1. zip
+		zip函数接受任意多个序列作为参数,将所有序列按相同的索引组合成一个元素是各个序列合并成的tuple的新序列，新的序列的长度以参数中最短的序列为准。另外(*)操作符与zip函数配合可以实现与zip相反的功能，即将合并的序列拆成多个tuple。
+		1) 返回带元组的列表
+		>>> a='<^>'
+		>>> b=['left', 'center', 'right']
+		>>> zip(a,b)
+		[('<', 'left'), ('^', 'center'), ('>', 'right')]
 
+		>>> name=['tom','david','liu']
+		>>> age=[20,23,21]
+		>>> zip(name,age)
+		[('tom', 20), ('david', 23), ('liu', 21)]
+
+		2) 新的序列长度以短的序列为准
+		>>> name=['tom','david','liu','pan']
+		>>> age=[20,23,21]
+		>>> zip(name,age)
+		[('tom', 20), ('david', 23), ('liu', 21)]
+
+		3) *操作符与zip函数配合可以实现与zip相反的功能,将合并的序列拆成多个tuple。(??底下例子如何理解)
+		>>> name=['tom','david','liu','pan']
+		>>> age=[20,23,21]
+		zip(*zip(name,age))
+		[('tom', 'david', 'liu'), (20, 23, 21)]
+
+		>>> a=[1,2,3,4,5,6]
+		>>> s=zip(*[a]*2)
+		>>> s
+		[(1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6)]
+		>>> s=zip(*[iter(a)]*2)
+		>>> s
+		[(1, 2), (3, 4), (5, 6)]
+
+专题:
+	1. format格式化
+		1) 接受位置参数输出
+			>>> '{0}, {1}, {2}'.format('a', 'b', 'c')
+			'a, b, c'
+			>>> '{}, {}, {}'.format('a', 'b', 'c')  # 2.7+ only
+			'a, b, c'
+			>>> '{2}, {1}, {0}'.format('a', 'b', 'c')
+			'c, b, a'
+			>>> '{2}, {1}, {0}'.format(*'abc')      # unpacking argument sequence
+			'c, b, a'
+			>>> '{0}{1}{0}'.format('abra', 'cad')   # arguments' indices can be repeated
+			'abracadabra'
+		2) 接受参数名称输出
+			>>> print "His name is {name} and age is {age} ".format(age=18,name='Tom')
+			His name is Tom and age is 18 
+		3) 接受对象属性输出
+			>>> class person():
+			... 	def __init__(self):
+			... 		self.name='Jack'
+			... 	def get_name(self):
+			... 		print 'his name is {self.name}'.format(self=self)
+			>>> p.get_name()
+			his name is Jack
+		4) 接受序列的数据输出
+			>>> a=('tom','Jack','meng')
+			>>> print '{0[0]},{0[1]},{0[2]}'.format(a)
+			tom,Jack,meng
+		5) 格式化输出,可代替%s,%r
+			>>> print 'His name is {}'.format('tom')
+			His name is tom
+			>>> print 'His name is {:10}'.format('tom')
+			His name is tom       
+			>>> print 'His name is {:<10}'.format('tom')
+			His name is tom       
+			>>> print 'His name is {:>10}'.format('tom')
+			His name is        tom
+			>>> print 'His name is {:^10}'.format('tom')
+			His name is    tom    
+			>>> print 'His name is {:*<10}'.format('tom')
+			His name is tom*******
+			>>> print 'His name is {:.>10}'.format('tom')
+			His name is .......tom
+			>>> print 'His name is {:#^10}'.format('tom')
+			His name is ###tom####
+			>>> print 'His name is {:#10}'.format('tom')
+			Traceback (most recent call last):
+			  File "<stdin>", line 1, in <module>
+			ValueError: Alternate form (#) not allowed in string format specifier
+			>>> print '%08.2f'%(1.15)
+			00001.15
+			>>> print '%8.2f'%(1.15)
+			    1.15
+			>>> print '{:8.2f}'.format(1.15)
+			    1.15
+
+			说明: 指定填充字符适合必须要指明对齐方向
+			
+			
+			
+
+	
+	
+		
+
+学习内容:
 		１. 文件操作
 		2. Atmos techrefresh code
 		3. S3操作
