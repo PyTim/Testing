@@ -947,6 +947,7 @@ Python学习笔记
 			3) 程序执行到发现try语句，进入try语句块执行，发生异常，回到try语句层，寻找后面是否有except语句。找到except语句后，会调用这个自定义的异常处理器。except将异常处理完毕后，程序继续往下执行; 如果没有except块程序程序在执行完finally后会自动调用默认异常处理。
 			4) else表示没有异常时候会执行； except可以有多个，后面也可以为空，表示捕获任何类型的异常；
 
+http://lib.csdn.net/base/python/structure
 
 HTTP:
 
@@ -1157,10 +1158,218 @@ S3
 
 			说明: 指定填充字符适合必须要指明对齐方向
 			
-			
-			
 
+Nose:
+	1. 当运行Nose时，它会自动寻找其名称以"test|Test"开头的文件，跟测试模块的名称一样，测试函数的名称也必须以test|Test开头。	
+	2. 运行方式：
+		1) nosetests -s <filename> 可以查看测试函数的执行过程,方便调试; 
+		   nosetests -s 也可以不指定文件名,会执行当前目录下所有测试文件中的测试函数;
+		   nosetests -s <测试目录> 也可以指定测试目录，会执行该目录下所有测试文件中的测试函数；
+		2) nosetests -v <filename> 可以查看测试函数的执行结果; 
+		   nosetests -v 也可以不指定文件名
+		   nosetests -v <目录名>
+		3) nosetests -s 文件名:测试函数名 用于调试某个测试文件中的某个具体测试函数，比如：
+			E:\Git_test\Testing\nose>nosetests -v test_fun.py:test_fun1
+			nose.test_fun.test_fun1 ... ok
+			
+			----------------------------------------------------------------------
+			Ran 1 test in 0.002s
+			
+			OK
+		4）nosetests -w 目录名
+			E:\Git_test\Testing>nosetests -w nose
+			......
+			-------------------------------------
+			Ran 6 tests in 0.002s
+			
+			OK
 	
+	3. setUp和tearDown
+		包中的setUp在所有文件执行前执行一次；模块中的setUp在该模块执行前执行一次；类中的setUp在类中的每个测试函数执行前执行；函数的setUp在对应的该测试函数执行前执行，需要赋值或者用with_setup;
+
+		1) 模块形式: test_module.py 代码:
+			def setUp():
+				print "run it before run function"
+			
+			def tearDown():
+				print "run it after run function"
+			
+			def test_fun1():
+				print "fun1 is running"
+			
+			def test_fun2():
+				print "fun2 is running"
+			运行结果1:
+			E:\Git_test\Testing\nose>nosetests -s test_fun.py
+			run it before run function
+			fun1 is running
+			.fun2 is running
+			.run it after run function
+			
+			----------------------------------------------------------------------
+			Ran 2 tests in 0.004s
+			
+			OK
+			运行结果2:
+			E:\Git_test\Testing\nose>nosetests -v test_fun.py
+			test_fun.test_fun1 ... ok
+			test_fun.test_fun2 ... ok
+			
+			--------------------------------------------------
+			Ran 2 tests in 0.004s
+			
+			OK
+
+		总结:
+			 1) 模块中直接定义的setUp函数会在模块中对应所有测试函数执行之前只执行一遍,tearDown函数会在模块中对应所有测试函数执行之后只执行一遍;
+			    执行过程: setUp->test_fun1->test_fun2->tearDown
+
+		2) 类形式: test_class.py代码
+			class test_person(object):
+				def __init__(self):
+					self.name = 'case'
+					
+				def setUp(self):
+					print self.name + " will start"
+				def tearDown(self):
+					print self.name + " completed"
+			
+				def test_fun1(self):
+					print "fun1 is running"
+				def test_fun2(self):
+					print "fun2 is running"
+			执行结果1:
+			E:\Git_test\Testing\nose>nosetests -s
+			case will start
+			fun1 is running
+			case completed
+			.case will start
+			fun2 is running
+			case completed
+			.
+			----------------------------------------------------------------------
+			Ran 2 tests in 0.010s
+			
+			OK
+			执行结果2:
+			E:\Git_test\Testing\nose>nosetests -v
+			test_class.test_person.test_fun1 ... ok
+			test_class.test_person.test_fun2 ... ok
+			
+			----------------------------------------------------------------------
+			Ran 2 tests in 0.005s
+			
+			OK
+		总结: 
+			1) 执行用例可以以类中的函数形式出现,类中定义的setUp函数会在类中的每个测试函数执行之前执行,tearDown函数会在类中的每个测试函数执行之后执行;
+			2) ??为什么第二个测试函数执行多了.
+			3) ??测试类中如何为每个测试函数初始化不同的属性值,比如不同的name,caseid;
+
+		3) 函数形式: test_fun.py代码
+			def test_fun2():
+				print "fun2 is running"
+			
+			def test_fun1():
+				print "fun1 is running"
+			
+			def setup_fun1():
+				print "fun1 will start"
+			
+			def teardown_fun1():
+				print "fun1 completed"
+			
+			def setup_fun2():
+				print "fun2 will start"
+			
+			def teardown_fun2():
+				print "fun2 completed"
+			
+			test_fun1.setUp=setup_fun1
+			test_fun1.tearDown=teardown_fun1
+			
+			test_fun2.setUp=setup_fun2
+			test_fun2.tearDown=teardown_fun2
+
+			执行结果:
+			E:\Git_test\Testing\nose>nosetests -s test_fun.py
+			fun2 will start
+			fun2 is running
+			fun2 completed
+			.fun1 will start
+			fun1 is running
+			fun1 completed
+			.
+			----------------------------------------------------------------------
+			Ran 2 tests in 0.004s
+			
+			OK
+		总结: 
+			1) 每个测试函数执行之前都会执行对应的setUp,通过 "函数名.setUp" 赋值;每个测试函数执行之后都会执行对应的tearDown
+			执行过程: setUp->fun1->tearDown->setUp->fun2->tearDown
+			2) 这种情况和类中定义setUp,tearDown比较像,都会在每个测试函数之前和之后执行,不同的是类中定义的setUp,tearDown都只定义一次,定义内容都相同,而函数中setUp,tearDown可以为每个函数重新定义不同的内容,如上所示.
+			3) 注意: 文件中直接通过def setUp和def tearDown定义的函数属于模块中的,这两个函数只在所以测试函数开头和结尾执行一遍,如果有需要在其中的某个测试函数前后执行,需要给该测试函数的setUp和tearDown赋值.
+			4) nose还支持在每个测试函数前使用with_setup来自定义测试用例的setUp及tearDown功能，这个可以代替上面赋值方式。比如上面代码可以修改为：
+				from nose.tools import with_setup
+	
+				def setup_fun1():
+					print "fun1 will start"
+				
+				def teardown_fun1():
+					print "fun1 completed"
+				
+				def setup_fun2():
+					print "fun2 will start"
+				
+				def teardown_fun2():
+					print "fun2 completed"
+				
+				@with_setup(setup_fun2,teardown_fun2)
+				def test_fun2():
+					print "fun2 is running"
+				
+				@with_setup(setup_fun1,teardown_fun1)
+				def test_fun1():
+					print "fun1 is running"
+				运行结果：
+				E:\Git_test\Testing\nose>nosetests -s test_fun.py
+				all test file will start.................
+				fun2 will start
+				fun2 is running
+				fun2 completed
+				.fun1 will start
+				fun1 is running
+				fun1 completed
+				.all test file already completed...............
+				
+				----------------------------------------------------------------------
+				Ran 2 tests in 0.000s
+				
+				OK
+
+		4) 包形式: __init__.py 代码
+			def setUp():
+				print "all test file will start................."
+			
+			def tearDown():
+				print "all test file already completed..............."
+		总结：
+			1) 创建python package时会自动生成__init__.py文件，我们将setUp或tearDown写入时，
+			会在所有测试模块也就是测试文件执行之前或者之后执行一次。
+	
+	4. 输出html报告
+		1) 安装html插件：pip install nose-html-reporting
+		2) 执行测试：nosetests --with-html --html-report=报告名, 例如：
+		E:\Git_test\Testing\nose>nosetests -v test_fun.py --with-html --html-report=report.html
+		nose.test_fun.test_fun2 ... ok
+		nose.test_fun.test_fun1 ... ok
+		
+		----------------------------------------------------------------------
+		HTML: report.html
+		----------------------------------------------------------------------
+		Ran 2 tests in 0.003s
+		
+		OK
+		执行结果：会在当前目录下生成报告文件report.html
 	
 		
 

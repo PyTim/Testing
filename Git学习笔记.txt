@@ -475,3 +475,24 @@ $ git config --global user.name "PyTim"
  	git diff --staged -- readme.txt 比较暂存区和版本库差异
  	git diff --cached -- readme.txt　比较暂存区和版本库差异
  	git diff head -- readme.txt  比较工作区和版本库中文件区别
+
+
+
+ 	实际操作过程：
+ 	git clone https://github.com/PyTim/Testing.git
+ 	git remote 
+ 	git remote -v
+ 	git remote add git_db https://github.com/PyTim/Testing.git
+
+ 	git push git_db master
+
+
+
+ Sublime:
+ 	1. JEDI
+ 	2. sublimeREPL
+ 	3. python PEP8 Autoformat
+ 	4. syncsidebar
+ 	5. sidebar
+ 	6. sublimeTmpl
+
