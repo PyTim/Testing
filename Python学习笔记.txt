@@ -470,6 +470,12 @@ Python学习笔记
 			>>> g.update(k)
 			>>> g
 			{'aobama': 'male', 'linken': 'male', 'jj': 'male', 'xilali': 'female', 'xibushi': 'male'}
+			>>> n={'aobama':'female'}
+			>>> g.update(n)
+			>>> g
+			{'linken': 'male', 'jj': 'male', 'xilali': 'female', 'aobama': 'female', 'xibushi': 'male'}
+
+			update方法更新字典，如果两个字典元素中key值有重复则取用新的value
 
 			删除字典
 			>>> g = {'aobama': 'male', 'xibushi': 'male', 'xilali': 'female', 'linken': 'male'}
@@ -855,6 +861,9 @@ Python学习笔记
 			3) 以上说的方法实际都是实例方法，其它还有静态方法，类方法。
 			4) 静态方法使用装饰器@staticmethod定义，并且方法参数中不能有self. 类对象和实例都可以调用静态方法,但是无法访问类属性、实例属性，相当于一个相对独立的方法，跟类其实没什么关系;
 			5) 类方法使用@classmethod装饰器定义，其第一个参数必须为cls，且不需要self参数。类对象和实例都可以调用类方法,可以访问类属性包含公有属性和私有属性，但是无法访问实例属性。
+
+			
+			还有一种类中普通的方法（没有self参数)，这种方法既可以被类直接调用也可以被类的实例对象调用，但是被实例对象调用的时候，要求方法至少有一个参数，因为调用时会将实例对象本身传给第一个参数。staticmethod函数功能就是将这种方法定义成类的静态方法，正确的方法是使用 @staticmethod装饰器，这样在实例对象调用的时候，不会把实例对象本身传入静态方法的第一个参数了。
 
 	    4. 构造方法
 			class student(object):
