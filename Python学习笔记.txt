@@ -1208,6 +1208,45 @@ Python学习笔记
 			>>> f.tell()
 			13L
 
+	八. 函数式编程
+		1. 闭包(closure)
+		闭包需满足三个条件： 1. 是嵌套函数；2. 内部函数使用了外部函数的变量；3. 外部函数返回内部函数
+			1) example1:
+				def fun1():
+					a=1
+					def fun2():
+						b = a+10
+						print b
+					return fun2
+				
+				print callable(fun1)
+				
+				my_fun2 = fun1()
+				my_fun2()
+			2) example2:
+				def fun1(a):
+					def fun2(b):
+						c = a+b
+						print c
+					return fun2
+				
+				my_fun2 = fun1(3)
+				my_fun2(8)
+
+			3) 注意点:
+				def fun1(a):
+					def fun2(b):
+						a = a+b
+						print a
+					return fun2
+				
+				my_fun2 = fun1(3)
+				my_fun2(8)
+				这段程序的本意是要通过在每次调用闭包函数时都对变量a进行递增的操作，但是会出现找不到变量a的错误。
+
+		2. 装饰器
+			1） 
+
 http://lib.csdn.net/base/python/structure
 
 HTTP:
