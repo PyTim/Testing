@@ -190,6 +190,58 @@ Python学习笔记
 			>>> a=A()
 			>>> type(a)
 			<type 'instance'>
+			4) 局部变量和全局变量
+				例1：
+					name='tom'
+					def test():
+						print name
+					
+					test()
+					输出：
+					tom
+					[Finished in 0.2s]
+					说明：函数中可以直接使用全局变量，打印name时候查找name变量，先查找局部name没有找到，再查找全局name，找到了然后输出。
+				例2:
+					name='tom'
+					def test2():
+						if name == 'tom':
+							pass
+						else:
+							name = 'liming'
+						print name
+					test2()
+					执行报错:UnboundLocalError: local variable 'name' referenced before assignment
+					说明：函数中先引用name判断是否等于'tom'，先找局部name没有找到，然后再找全局name找到了，所以使用全局name判断，然后else中又对这个全局name进行赋值，所以报错。
+					如果函数中的变量是引用的全局变量，那么函数不能对该变量直接重新赋值，如果必须重新赋值那么需要在函数中先通过global引用，如下例3。
+				例3：
+					name='tom'
+					def test2():
+						global name
+						if name == 'tim':
+							pass
+						else:
+							name = 'liming'
+						print name
+					test2()
+					print name
+					正常输出:
+					liming
+					liming
+					[Finished in 0.2s]
+					说明：这个函数中通过使用global引用了全局name，所以在函数中可以对该全局name重新赋值。重结果中可以看到全局name的值已经被修改。
+				例4:
+					name='tom'
+					def test2():
+						name = 'liming'
+						print name
+					test2()
+					print name
+					正常输出：
+					liming
+					tom
+					[Finished in 0.3s]
+					说明：此处在函数中直接定义了一个局部name，注意这个是定义局部变量而不会查找全局变量。局部变量和全局变量都可以正常输出，互不影响。
+
 		
 		
 	三. 条件判断和循环
@@ -1209,8 +1261,87 @@ Python学习笔记
 			13L
 
 	八. 函数式编程
-		1. 闭包(closure)
-		闭包需满足三个条件： 1. 是嵌套函数；2. 内部函数使用了外部函数的变量；3. 外部函数返回内部函数
+		1. 函数参数
+			1. 必选参数
+				def test(name,age):
+					print name,age
+				
+				test('tom',28)
+				test(age='10', name='lik')
+				输出结果：
+				tom 28
+				lik 10
+				[Finished in 0.2s]
+				说明：针对必选参数，调用函数时候参数的个数以及位置要分别对应；如果在调用时候想不按照位置顺序传递，那么必须指定参数名
+
+			2. 默认参数
+				def test(name='tom',age='20'):
+					print name,age
+				
+				test(28)
+				test()
+				test(age='28')
+				输出结果：
+				28 20
+				tom 20
+				tom 28
+				[Finished in 0.2s]
+				说明：针对默认参数，函数调用时候可以不指定。调用函数时候也可以指定参数名重新赋值，也可以不指定参数名此时按参数顺序传递；
+				另外默认参数要定义为不可变对象，不要定义为可变对象如list，否则会发生逻辑问题,如下每次调用test时候teacher默认参数的值没有被清空。
+				def test(name='tom',teacher=[]):
+					teacher.append('ll')
+					print teacher
+				
+				test()
+				test()
+
+			3. 可变参数：
+			    *args, args是一个list或者tuple,通过在前面加一个*就表示list或者tuple中的单个元素，从而表示多个参数值
+				def test(*args):
+					for arg in args:
+						print arg
+								
+				args=('12','66','09')
+				test(*args)
+				print '-----------------'
+				args=['900','8d']
+				test(*args)
+				print '-----------------'
+				test('ddd',923)
+			
+			4. 关键字参数
+				def test(**kw):
+					for (key,value) in kw.items():
+						print key,kw[key]
+				
+				test(name='to',age='20')
+				print '---'
+				kw={'name':'tom','age':'30','height':'180'}
+				test(**kw)
+
+			5. 参数混合定义的顺序必须遵守：
+			   必选参数->默认参数->可变参数->关键字参数。另外默认参数最好定义为不可变对象，不要定义为list。
+				def test(name,gender,age=21,height=180):
+					print name,gender,age,height
+								
+				test('tom',28,22)
+				test('tom',28,height=190)
+				test(gender='male',name='kk')
+	
+		2. 函数执行：
+			1）函数体内部的语句在执行时，一旦执行到return时，函数就执行完毕并将结果返回。哪怕是在循环中循环还未结束也会结束函数执行。
+			如果没有return语句，函数执行完毕后也会返回结果，只是结果为None。return None可以简写为return
+			2) 空函数,如果想定义一个什么事也不做的空函数，可以用pass语句：
+                      def nop():
+                          pass
+            3) pass语句什么都不做，那有什么用？实际上pass可以用来作为占位符，比如现在还没想好怎么写函数的代码，就可以先放一个pass，让代码能运行起来。
+            4) 调用函数时，如果参数个数不对，Python解释器会自动检查出来，并抛出TypeError: my_abs() takes exactly 1 argument (2 given)
+            但是如果参数类型不对，Python解释器就无法帮我们检查.所以需要时候可以先对参数类型做检查。
+            5) 返回多个值，比如return x,y，实际返回的是一个元祖(x,y)
+
+
+		3. 闭包(closure)
+			闭包需满足三个条件： 1. 是嵌套函数；2. 内部函数使用了外部函数的变量；3. 外部函数返回内部函数
 			1) example1:
 				def fun1():
 					a=1
@@ -1244,7 +1375,7 @@ Python学习笔记
 				my_fun2(8)
 				这段程序的本意是要通过在每次调用闭包函数时都对变量a进行递增的操作，但是会出现找不到变量a的错误。
 
-		2. 装饰器
+		4. 装饰器
 			1） 
 
 http://lib.csdn.net/base/python/structure
