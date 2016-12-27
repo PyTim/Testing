@@ -1305,19 +1305,19 @@ Python学习笔记
 				test(*args)
 				print '-----------------'
 				args=['900','8d']
-				test(*args)
+				test(*args)               //函数在调用时候直接使用序列，主要要带上*
 				print '-----------------'
-				test('ddd',923)
+				test('ddd',923)           //函数在调用时候直接使用必选参数形式，这些参数会自动被组装成一个列表
 			
 			4. 关键字参数
 				def test(**kw):
 					for (key,value) in kw.items():
 						print key,kw[key]
 				
-				test(name='to',age='20')
+				test(name='to',age='20')   //函数在调用时候直接使用参数形式，这些参数会自动被组装成一个字典
 				print '---'
 				kw={'name':'tom','age':'30','height':'180'}
-				test(**kw)
+				test(**kw)                 //函数在调用时候直接使用字典，注意要带上**
 
 			5. 参数混合定义的顺序必须遵守：
 			   必选参数->默认参数->可变参数->关键字参数。另外默认参数最好定义为不可变对象，不要定义为list。
@@ -1441,6 +1441,27 @@ Python学习笔记
 				t.next()
 				t.next()
 				说明：如果生成器中有return,在执行过程中 return，则直接抛出 StopIteration 终止迭代。
+
+				def readfile(file_name):
+					seek_option=0
+					while True:
+						with open(file_name) as f:
+							f.seek(seek_option)
+							data = f.readline()
+							if data:
+								yield data
+								seek_option = f.tell()
+							else:
+								return
+				
+				print readfile('README.md')
+				file = readfile('README.md')
+				for data in file:
+					print data
+				for data in readfile('README.md'):
+					print data
+				说明： 上述定义了一个读取文件的生成器。生成器一般可以和for循环配合使用，这样可以迭代生成器元素，而不使用next方法。
+
 
 			3）迭代器(Iterators)
 			    任何具有__next__()方法的对象都是迭代器。
@@ -1626,6 +1647,17 @@ S3
 		>>> s=zip(*[iter(a)]*2)
 		>>> s
 		[(1, 2), (3, 4), (5, 6)]
+	2. help()
+	   dir()
+	   vars()
+	   reload()
+	   id()
+	   map()
+	   filter()
+	   reduce()
+	3. python 反射
+	   以字符串形式导入模块，以字符串形式执行函数
+
 
 专题:
 	1. format格式化
@@ -1910,6 +1942,25 @@ Nose:
 常用知识点总结：
    1. os.system. popen, commands.getstatusoutput
    2. 列表生成式，生成器，迭代器
+   3. 包和文件夹的区别：
+      目录下必须有__init__.py文件才能称为包，并且才能使用： form 包 import 模块
+      模块就是python文件名
+      判断是否主文件（这个可限定当前文件执行生效，被其它程序引用时候不执行）：if __name__ == '__main__':
+      文件绝对路径（包括文件名） __file__
+      模块级别注释： __doc__
+   4. 三元运算符：
+   		temp=None
+		if 10>1:
+			temp=True
+		else:
+			temp=False
+		print temp
+		
+		temp = True if 10>1 else False
+		print temp
+   5. lamada函数：
+        temp = lambda x,y:x+y   
+		print temp(2,3)    //lamada函数赋给一变量实际就相当于定义一个函数名，函数经常不被调用并且比较简单才会使用lamada
 
 
 
